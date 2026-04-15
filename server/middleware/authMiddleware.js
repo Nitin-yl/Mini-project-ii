@@ -5,6 +5,14 @@ import User from "../models/userModel.js";
 const protectRoute = asyncHandler(async (req, res, next) => {
   let token = req.cookies.token;
 
+  if (
+    !token &&
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
   if (token) {
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);

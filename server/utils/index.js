@@ -13,6 +13,8 @@ const createJWT = (res, userId) => {
     sameSite: isProduction ? "none" : "lax",
     maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
   });
+
+  return token;
 };
 
 export default createJWT;
