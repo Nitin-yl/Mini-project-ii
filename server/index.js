@@ -12,12 +12,17 @@ dotenv.config();
 dbConnection();
 
 const port = process.env.PORT || 5000;
+const allowedOrigins = [
+  "https://mini-project-ii-topaz.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:3001",
+].filter(Boolean);
 
 const app = express();
 
 app.use(
   cors({
-    origin: ["https://mini-project-ii-topaz.vercel.app", "http://localhost:3000", "http://localhost:3001"],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
   })
@@ -34,4 +39,8 @@ app.use("/api", routes);
 app.use(routeNotFound);
 app.use(errorHandler);
 
-app.listen(port, () => console.log(`Server listening on ${port}`));
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => console.log(`Server listening on ${port}`));
+}
+
+export default app;
