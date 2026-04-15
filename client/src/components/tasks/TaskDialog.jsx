@@ -220,9 +220,7 @@ export default function TaskDialog({ task }) {
               </div>
 
               <div className='px-1 py-1'>
-                <Menu.Item>
-                  <ChangeTaskActions id={task._id} {...task} />
-                </Menu.Item>
+                <ChangeTaskActions _id={task._id} stage={task.stage} />
               </div>
 
               <div className='px-1 py-1'>

@@ -6,7 +6,10 @@ import { useGetTeamListsQuery } from "../../redux/slices/api/userApiSlice.js";
 import { getInitials } from "../../utils/index.js";
 
 export default function UserList({ team, setTeam }) {
-  const { data, isLoading } = useGetTeamListsQuery({ search: "" });
+  const { data, isLoading } = useGetTeamListsQuery(
+    { search: "" },
+    { refetchOnMountOrArgChange: true }
+  );
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   const handleChange = (el) => {

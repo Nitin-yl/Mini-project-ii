@@ -242,7 +242,7 @@ const getTasks = asyncHandler(async (req, res) => {
   let query = { isTrashed: isTrashed ? true : false };
 
   if (!isAdmin) {
-    query.team = { $all: [userId] };
+    query.team = userId;
   }
   if (stage) {
     query.stage = stage;
@@ -277,6 +277,7 @@ const getTasks = asyncHandler(async (req, res) => {
 const getTask = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId, isAdmin } = req.user;
 
     const task = await Task.findById(id)
       .populate({
@@ -286,8 +287,23 @@ const getTask = asyncHandler(async (req, res) => {
       .populate({
         path: "activities.by",
         select: "name",
-      })
-      .sort({ _id: -1 });
+      });
+
+    if (!task) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Task not found." });
+    }
+
+    if (
+      !isAdmin &&
+      !task.team.some((member) => member?._id?.toString() === userId)
+    ) {
+      return res.status(403).json({
+        status: false,
+        message: "Not authorized to view this task.",
+      });
+    }
 
     res.status(200).json({
       status: true,
@@ -390,7 +406,7 @@ const dashboardStatistics = asyncHandler(async (req, res) => {
           .sort({ _id: -1 })
       : await Task.find({
           isTrashed: false,
-          team: { $all: [userId] },
+          team: userId,
         })
           .populate({
             path: "team",

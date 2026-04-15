@@ -73,8 +73,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // POST -  Logout user / clear cookie
 const logoutUser = (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("token", "", {
     httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     expires: new Date(0),
   });
   res.status(200).json({ message: "Logged out successfully" });
