@@ -18,6 +18,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Users"],
     }),
     logout: builder.mutation({
       query: () => ({

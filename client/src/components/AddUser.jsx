@@ -32,10 +32,7 @@ const AddUser = ({ open, setOpen, userData }) => {
           dispatch(setCredentials({ ...res?.user }));
         }
       } else {
-        const res = await addNewUser({
-          ...data,
-          password: data?.email,
-        }).unwrap();
+        const res = await addNewUser(data).unwrap();
         toast.success("New User added successfully");
       }
 
@@ -104,6 +101,23 @@ const AddUser = ({ open, setOpen, userData }) => {
               })}
               error={errors.role ? errors.role.message : ""}
             />
+            {!userData && (
+              <Textbox
+                placeholder='Password'
+                type='password'
+                name='password'
+                label='Password'
+                className='w-full rounded'
+                register={register("password", {
+                  required: "Password is required!",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters.",
+                  },
+                })}
+                error={errors.password ? errors.password.message : ""}
+              />
+            )}
           </div>
 
           {isLoading || isUpdating ? (
