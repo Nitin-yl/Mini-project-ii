@@ -24,7 +24,11 @@ export default function NotificationPanel() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
-  const { data, refetch } = useGetNotificationsQuery();
+  const { data = [], refetch } = useGetNotificationsQuery(undefined, {
+    pollingInterval: 15000,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
   const [markAsRead] = useMarkNotiAsReadMutation();
 
   const viewHandler = (el) => {
@@ -73,11 +77,11 @@ export default function NotificationPanel() {
           leaveTo='opacity-0 translate-y-1'
         >
           <Popover.Panel className='absolute -right-16 md:-right-2 z-10 mt-5 flex w-screen max-w-max  px-4'>
-            {({ close }) =>
-              data?.length > 0 && (
-                <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white dark:bg-[#1f1f1f] text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
-                  <div className='p-4'>
-                    {data?.slice(0, 5).map((item, index) => (
+            {({ close }) => (
+              <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white dark:bg-[#1f1f1f] text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
+                <div className='p-4'>
+                  {data.length > 0 ? (
+                    data.slice(0, 5).map((item, index) => (
                       <div
                         key={item._id + index}
                         className='group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-[#1c1c1c]'
@@ -91,7 +95,7 @@ export default function NotificationPanel() {
                           onClick={() => viewHandler(item)}
                         >
                           <div className='flex items-center gap-3 font-semibold text-gray-900 capitalize dark:text-gray-200'>
-                            <p> {item.notiType}</p>
+                            <p>{item.notiType}</p>
                             <span className='text-xs font-normal lowercase'>
                               {moment(item.createdAt).fromNow()}
                             </span>
@@ -101,25 +105,29 @@ export default function NotificationPanel() {
                           </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-
-                  <div className='grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50 dark:bg-[#1f1f1f]'>
-                    {callsToAction.map((item) => (
-                      <Link
-                        key={item.name}
-                        onClick={
-                          item?.onClick ? () => item.onClick() : () => close()
-                        }
-                        className='flex items-center justify-center gap-x-2.5 p-3 font-semibold text-blue-600 hover:bg-gray-100 dark:hover:bg-[#1c1c1c]'
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <div className='px-4 py-6 text-center text-gray-500'>
+                      No new notifications
+                    </div>
+                  )}
                 </div>
-              )
-            }
+
+                <div className='grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50 dark:bg-[#1f1f1f]'>
+                  {callsToAction.map((item) => (
+                    <Link
+                      key={item.name}
+                      onClick={
+                        item?.onClick ? () => item.onClick() : () => close()
+                      }
+                      className='flex items-center justify-center gap-x-2.5 p-3 font-semibold text-blue-600 hover:bg-gray-100 dark:hover:bg-[#1c1c1c]'
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </Popover.Panel>
         </Transition>
       </Popover>
